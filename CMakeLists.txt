@@ -16,9 +16,8 @@ link_directories(${MAYA_LIB_DIR})
 
 # Compile as DLL
 set(SOURCE_FILES
-	"src/VectorDisplacementDeformerNode.cpp"
-	"src/VectorDisplacementDeformerNode.h"
- )
+	"src/VectorDisplacementDeformerNode.cpp" "src/VectorDisplacementDeformerNode.h"
+	"src/VectorDisplacementUtilities.h" "src/VectorDisplacementUtilities.cpp")
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
@@ -26,7 +25,7 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/export:initializePlugin /export:uninitializePlugin")
 
 # Link necessary libraries
-target_link_libraries(${PROJECT_NAME} Foundation OpenMaya OpenMayaAnim)
+target_link_libraries(${PROJECT_NAME} Foundation OpenMaya OpenMayaAnim OpenMayaFx)
 
 # Duplicate and rename DLL to MLL for loading in Maya
 add_custom_command(
