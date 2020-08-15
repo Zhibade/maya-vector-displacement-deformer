@@ -67,6 +67,8 @@ public:
     /** Initializer function for this node. Initializes attributes and makes it a paintable deformer */
     static MStatus initialize();
 
+    static MStringArray menuItems;
+
     static MTypeId Id;  // Node unique ID
     static MObject strengthAttribute;   // Strength to use when applying displacement. 1 = Full strenght, 0 = no deformation
     static MObject displacementMapAttribute; // Displacement map to use when deforming

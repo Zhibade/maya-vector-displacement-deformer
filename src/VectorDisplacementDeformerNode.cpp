@@ -33,6 +33,8 @@ MObject VectorDisplacementDeformerNode::strengthAttribute;
 MObject VectorDisplacementDeformerNode::displacementMapAttribute;
 MObject VectorDisplacementDeformerNode::displacementMapTypeAttribute;
 
+MStringArray VectorDisplacementDeformerNode::menuItems;
+
 
 MStatus VectorDisplacementDeformerNode::deform(MDataBlock& data, MItGeometry& itGeometry, const MMatrix& localToWorldMatrix, unsigned int mIndex)
 {
@@ -213,6 +215,15 @@ MStatus initializePlugin(MObject obj)
         VectorDisplacementDeformerNode::Id, VectorDisplacementDeformerNode::creator,
         VectorDisplacementDeformerNode::initialize, MPxNode::kDeformerNode);
 
+    // Adding menus through C++ API to avoid having to include more complicated MEL/Python script setups for now
+    MStringArray modelingMenuItem = plugin.addMenuItem("Vector Displacement", "mainDeformMenu", "deformer", "-type vectorDisplacement");
+    MStringArray animMenuItem = plugin.addMenuItem("Vector Displacement", "mainDeformationMenu", "deformer", "-type vectorDisplacement");
+    MStringArray riggingMenuItem = plugin.addMenuItem("Vector Displacement", "mainRigDeformationsMenu", "deformer", "-type vectorDisplacement");
+
+    VectorDisplacementDeformerNode::menuItems.append(modelingMenuItem[0]);
+    VectorDisplacementDeformerNode::menuItems.append(animMenuItem[0]);
+    VectorDisplacementDeformerNode::menuItems.append(riggingMenuItem[0]);
+
     CHECK_MSTATUS_AND_RETURN_IT(status);
     return status;
 }
@@ -222,6 +233,8 @@ MStatus uninitializePlugin(MObject obj)
     MFnPlugin plugin(obj);
 
     MStatus status = plugin.deregisterNode(VectorDisplacementDeformerNode::Id);
+
+    plugin.removeMenuItem(VectorDisplacementDeformerNode::menuItems);
 
     CHECK_MSTATUS_AND_RETURN_IT(status);
     return status;
