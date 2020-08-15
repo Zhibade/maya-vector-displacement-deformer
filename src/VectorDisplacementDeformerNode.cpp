@@ -7,10 +7,13 @@
  */
 
 #include "VectorDisplacementDeformerNode.h"
+#include "VectorDisplacementHelperTypes.h"
 #include "VectorDisplacementUtilities.h"
 
 #include <maya/MDataBlock.h>
 #include <maya/MDynamicsUtil.h>
+#include <maya/MFloatVectorArray.h>
+#include <maya/MFnEnumAttribute.h>
 #include <maya/MFnDependencyNode.h>
 #include <maya/MFnNumericAttribute.h>
 #include <maya/MFnPlugin.h>
@@ -28,6 +31,7 @@ constexpr char* DISPLACEMENT_MAP_ATTRIBUTE = "vectorDisplacementMap";
 MTypeId VectorDisplacementDeformerNode::Id(0x00000000);
 MObject VectorDisplacementDeformerNode::strengthAttribute;
 MObject VectorDisplacementDeformerNode::displacementMapAttribute;
+MObject VectorDisplacementDeformerNode::displacementMapTypeAttribute;
 
 
 MStatus VectorDisplacementDeformerNode::deform(MDataBlock& data, MItGeometry& itGeometry, const MMatrix& localToWorldMatrix, unsigned int mIndex)
@@ -49,14 +53,44 @@ MStatus VectorDisplacementDeformerNode::deform(MDataBlock& data, MItGeometry& it
         return textureDataFetchStatus;
     }
 
+    // Get vector displacement map type from plug
+
+    VectorDisplacementMapType mapType = static_cast<VectorDisplacementMapType>(data.inputValue(displacementMapTypeAttribute).asInt());
+
+    // Get other mesh data needed for tangent-space maps
+
+    MFloatVectorArray normals;
+    MFloatVectorArray tangents;
+    MFloatVectorArray binormals;
+
+    if (mapType == VectorDisplacementMapType::TANGENT_SPACE)
+    {
+        MStatus vertexDataFetchStatus = VectorDisplacementUtilities::getMeshVertexData(getInputGeom(data, mIndex), normals, tangents, binormals);
+
+        if (vertexDataFetchStatus != MS::kSuccess)
+        {
+            return vertexDataFetchStatus;
+        }
+    }
+    
     // Iterate through mesh vertices and deform based on texture data
 
     for (; !itGeometry.isDone(); itGeometry.next())
     {
-        MPoint initialVert = itGeometry.position();
         float paintedWeight = weightValue(data, mIndex, itGeometry.index());
 
-        MPoint displacedVert = VectorDisplacementUtilities::getDisplacedVertex(initialVert, itGeometry.index(), mapColor, mapAlpha, paintedWeight * finalWeight);
+        VertexData vertexData;
+        vertexData.position = itGeometry.position();
+        vertexData.index = itGeometry.index();
+
+        if (mapType == VectorDisplacementMapType::TANGENT_SPACE)
+        {
+            vertexData.normal = normals[vertexData.index];
+            vertexData.tangent = tangents[vertexData.index];
+            vertexData.binormal = binormals[vertexData.index];
+        }
+
+        MPoint displacedVert = VectorDisplacementUtilities::getDisplacedVertex(vertexData, mapColor, mapAlpha, paintedWeight * finalWeight, mapType);
         itGeometry.setPosition(displacedVert);
     }
 
@@ -143,6 +177,7 @@ MStatus VectorDisplacementDeformerNode::initialize()
     // Initialize attributes
 
     MFnNumericAttribute numberAttr;
+    MFnEnumAttribute enumAttr;
 
     strengthAttribute = numberAttr.create("strength", "s", MFnNumericData::kFloat);
     numberAttr.setKeyable(true);
@@ -152,10 +187,16 @@ MStatus VectorDisplacementDeformerNode::initialize()
 
     displacementMapAttribute = numberAttr.createColor("vectorDisplacementMap", "vdmap");
 
+    displacementMapTypeAttribute = enumAttr.create("displacementMapType", "vdmapType", 0);
+    enumAttr.addField("Object", 0);
+    enumAttr.addField("Tangent", 1);
+
     addAttribute(strengthAttribute);
     addAttribute(displacementMapAttribute);
+    addAttribute(displacementMapTypeAttribute);
     attributeAffects(strengthAttribute, outputGeom);
     attributeAffects(displacementMapAttribute, outputGeom);
+    attributeAffects(displacementMapTypeAttribute, outputGeom);
 
     // Make paintable
 

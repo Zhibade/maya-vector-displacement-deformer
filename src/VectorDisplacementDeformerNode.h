@@ -70,4 +70,5 @@ public:
     static MTypeId Id;  // Node unique ID
     static MObject strengthAttribute;   // Strength to use when applying displacement. 1 = Full strenght, 0 = no deformation
     static MObject displacementMapAttribute; // Displacement map to use when deforming
+    static MObject displacementMapTypeAttribute; // Displacement map type (object or tangent)
 };

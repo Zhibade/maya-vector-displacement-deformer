@@ -17,7 +17,8 @@ link_directories(${MAYA_LIB_DIR})
 # Compile as DLL
 set(SOURCE_FILES
 	"src/VectorDisplacementDeformerNode.cpp" "src/VectorDisplacementDeformerNode.h"
-	"src/VectorDisplacementUtilities.h" "src/VectorDisplacementUtilities.cpp")
+	"src/VectorDisplacementUtilities.h" "src/VectorDisplacementUtilities.cpp"
+	"src/VectorDisplacementHelperTypes.h")
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
