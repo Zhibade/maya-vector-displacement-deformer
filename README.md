@@ -8,8 +8,8 @@ C++ Maya vector displacement plugin. Supports displacement maps in object-space 
 
 # How to use
 - Compile the plugin
-- Load the plugin in Maya (Window -> Settings/Preferences -> Plugin Manager -> Reference -> Plugin file (.mll, .bundle or .so))
-- In any "Deform" menu click the *Vector Displacement* entry or run the following MEL command: `deformer -type vectorDisplacement;`
+- Load the plugin in Maya (*Window* -> *Settings/Preferences* -> *Plugin Manager* -> *Reference* -> *Plugin file (.mll, .bundle or .so)*)
+- In any *Deform* menu click the *Vector Displacement* entry or run the following MEL command: `deformer -type vectorDisplacement;`
 - In the attribute editor, in the *Vector Displacement Map* attribute load the vector displacement file.
 - Set the *Displacement Map Type* attribute to match the type of the loaded vector displacement map.
   - Object = Object-space
@@ -35,7 +35,7 @@ C++のMayaのベクターディスプレイスメントデフォーマ。オブ�
 - Mayaでプラグインをロードします。（ウィンドウ　→　設定／プリファレンス　→　プラグイン マネージャ　→　参考　→　プラグインファイル（「.mll」、「.bundle」または「.so」））
 - デフォームメニューで「Vector Displacement」の項目をクリックします。あるいは次のMELコマンドを実行します：`deformer -type vectorDisplacement;`
 - アトリビュートエディタで「Vector Displacement Map」のアトリビュートにディスプレイスメントファイルをロードします。
-- ロードしたディスプレイスメントのタイプに合わせるように「Displacement Map　Type」のアトリビュートを設定します。
+- ロードしたディスプレイスメントのタイプに合わせるように「Displacement Map Type」のアトリビュートを設定します。
   - Object＝オブジェクト空間。
   - Tangent＝接空間。
 - 「Strength」のアトリビュートでディスプレイスメントの強度を変更できます。
