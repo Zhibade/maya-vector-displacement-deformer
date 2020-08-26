@@ -1,7 +1,11 @@
 ## 日本語は下記です。
 
 # Overview
-C++ Maya vector displacement plugin. Supports displacement maps in object-space and tangent-space.
+C++ Maya vector displacement plugin.
+
+- Supports displacement maps in object-space and tangent-space.
+- GPU deformer support
+- Paint weights support
 
 ![Maya Vector Displacement Deformer](https://github.com/Zhibade/maya-vector-displacement-deformer/raw/master/docs/MayaVectorDisplacementShader.gif)
 
@@ -25,7 +29,11 @@ C++ Maya vector displacement plugin. Supports displacement maps in object-space 
 
 
 # 概要
-C++のMayaのベクターディスプレイスメントデフォーマ。オブジェクト空間または接空間のディスプレイスメントマップ対応です。
+C++のMayaのベクターディスプレイスメントデフォーマ。
+
+- オブジェクト空間または接空間のディスプレイスメントマップ対応です。
+- GPUデフォーマ対応
+- ペイントウエイト対応
 
 ![Maya Vector Displacement Deformer](https://github.com/Zhibade/maya-vector-displacement-deformer/raw/master/docs/MayaVectorDisplacementShader.gif)
 

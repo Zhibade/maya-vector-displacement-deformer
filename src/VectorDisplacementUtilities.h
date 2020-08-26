@@ -68,6 +68,19 @@ public:
     */
     static MStatus getMeshVertexData(MObject meshItem, MFloatVectorArray& normals, MFloatVectorArray& tangents, MFloatVectorArray& binormals);
 
+    /**
+    * Gets a map texture data from the given node. If no texture is connected it does nothing.
+    *
+    * @param[in] nodeObject - Node to get the texture data from as an MObject
+    * @param[in] meshItem - Mesh item to get the corresponding UV-matched texture data from
+    * @param[in] attributeName - Name of the texture map attribute
+    * @param[out] colorData - Texture color data will be copied to this parameter if successful
+    * @param[out] alphaData - Texture alpha data will be copied to this parameter if successful
+    *
+    * @return MStatus indicating if operation was successful or not
+    */
+    static MStatus getTextureData(const MObject& nodeObject, const MObject& meshItem, const char* attributeName, MVectorArray& colorData, MDoubleArray& alphaData);
+
 private:
     /**
     * Applies the vector displacement map as an object space displacement

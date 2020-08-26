@@ -8,10 +8,13 @@
 
 #include "VectorDisplacementUtilities.h"
 
+#include <maya/MDynamicsUtil.h>
 #include <maya/MFnMesh.h>
 #include <maya/MGlobal.h>
 #include <maya/MItMeshPolygon.h>
 #include <maya/MItMeshVertex.h>
+#include <maya/MPlug.h>
+#include <maya/MPlugArray.h>
 
 
 MStatus VectorDisplacementUtilities::getAveragedTangentsAndBinormals(MObject meshItem, MFloatVectorArray& tangents, MFloatVectorArray& binormals)
@@ -156,6 +159,60 @@ MStatus VectorDisplacementUtilities::getMeshVertexData(MObject meshItem, MFloatV
     VectorDisplacementUtilities::getAveragedTangentsAndBinormals(meshItem, tangents, binormals);
 
     return MStatus::kSuccess;
+}
+
+MStatus VectorDisplacementUtilities::getTextureData(const MObject& nodeObject, const MObject& meshItem, const char* attributeName, MVectorArray& colorData, MDoubleArray& alphaData)
+{
+    // Check plug
+
+    MStatus displacementMapPlugStatus;
+    MFnDependencyNode thisNode(nodeObject);
+    MPlug displacementMapPlug = thisNode.findPlug(attributeName, true, &displacementMapPlugStatus);
+
+    if (displacementMapPlugStatus != MS::kSuccess)
+    {
+        return displacementMapPlugStatus; // Return same error that we got. In theory this should never be reached.
+    }
+
+    // Check if plug is connected to a source node
+
+    MPlugArray connections;
+    displacementMapPlug.connectedTo(connections, true, false);
+
+    if (connections.length() <= 0)
+    {
+        return MS::kInvalidParameter;
+    }
+
+    // Check if plugged in texture node is valid
+
+    MObject mapAttribute = thisNode.attribute(attributeName);
+
+    bool isConnectedToValidNode = MDynamicsUtil::hasValidDynamics2dTexture(nodeObject, mapAttribute);
+    if (!isConnectedToValidNode)
+    {
+        logError("Connected node is not a valid 2D texture node. Please connect a 2D texture node to the vector displacement map attribute.");
+        return MS::kInvalidParameter;
+    }
+
+    // Finally, get texture color and alpha data
+
+    MDoubleArray uCoords;
+    MDoubleArray vCoords;
+
+    getMeshUvData(meshItem, uCoords, vCoords);
+
+    MStatus readTextureStatus = MDynamicsUtil::evalDynamics2dTexture(nodeObject, mapAttribute, uCoords, vCoords, &colorData, &alphaData);
+
+    if (readTextureStatus == MS::kSuccess)
+    {
+        return MS::kSuccess;
+    }
+    else
+    {
+        logError("An error occurred when trying to read vector displacement map texture. Please verify that it is a valid texture");
+        return MS::kFailure;
+    }
 }
 
 MPoint VectorDisplacementUtilities::applyObjectDisplacement(const MPoint& vertex, MVector rgbData, float strength)

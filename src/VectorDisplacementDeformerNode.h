@@ -42,19 +42,6 @@ public:
     virtual MObject getInputGeom(MDataBlock& data, unsigned int geomIndex) const;
 
     /**
-    * Gets the displacement map texture data based on received data. If no texture is connected it does nothing.
-    *
-    * @param data - Data block for this given node
-    * @param itGeometry - Geometry iterator that gets passed to the "deform" method
-    * @param geomIndex - Index of the geometry to get the texture data for
-    * @param colorData - Texture color data will be copied to this parameter if successful
-    * @param alphaData - Texture alpha data will be copied to this parameter if successful
-    *
-    * @return MStatus indicating if operation was successful or not
-    */
-    virtual MStatus getTextureData(MDataBlock& data, const MItGeometry& itGeometry, unsigned int geomIndex, MVectorArray& colorData, MDoubleArray& alphaData) const;
-
-    /**
     * Logs an error message using a predefined format (Node name + message)
     *
     * @param message - Error message to log
@@ -73,4 +60,6 @@ public:
     static MObject strengthAttribute;   // Strength to use when applying displacement. 1 = Full strenght, 0 = no deformation
     static MObject displacementMapAttribute; // Displacement map to use when deforming
     static MObject displacementMapTypeAttribute; // Displacement map type (object or tangent)
+
+    static constexpr char* DISPLACEMENT_MAP_ATTRIBUTE = "vectorDisplacementMap";
 };

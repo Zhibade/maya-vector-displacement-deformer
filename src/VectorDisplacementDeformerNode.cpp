@@ -7,11 +7,11 @@
  */
 
 #include "VectorDisplacementDeformerNode.h"
+#include "VectorDisplacementGpuDeformerNode.h"
 #include "VectorDisplacementHelperTypes.h"
 #include "VectorDisplacementUtilities.h"
 
 #include <maya/MDataBlock.h>
-#include <maya/MDynamicsUtil.h>
 #include <maya/MFloatVectorArray.h>
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MFnDependencyNode.h>
@@ -25,10 +25,10 @@
 #include <maya/MTypes.h>
 
 
-constexpr char* DISPLACEMENT_MAP_ATTRIBUTE = "vectorDisplacementMap";
+constexpr char* NODE_NAME = "vectorDisplacement";
 
 
-MTypeId VectorDisplacementDeformerNode::Id(0x00000000);
+MTypeId VectorDisplacementDeformerNode::Id(0x00000001); // Can't be 0, otherwise the GPU deformer registration won't work
 MObject VectorDisplacementDeformerNode::strengthAttribute;
 MObject VectorDisplacementDeformerNode::displacementMapAttribute;
 MObject VectorDisplacementDeformerNode::displacementMapTypeAttribute;
@@ -48,7 +48,7 @@ MStatus VectorDisplacementDeformerNode::deform(MDataBlock& data, MItGeometry& it
 
     MVectorArray mapColor;
     MDoubleArray mapAlpha;
-    MStatus textureDataFetchStatus = getTextureData(data, itGeometry, mIndex, mapColor, mapAlpha);
+    MStatus textureDataFetchStatus = VectorDisplacementUtilities::getTextureData(thisMObject(), getInputGeom(data, mIndex), DISPLACEMENT_MAP_ATTRIBUTE, mapColor, mapAlpha);
 
     if (textureDataFetchStatus != MS::kSuccess)
     {
@@ -109,60 +109,6 @@ MObject VectorDisplacementDeformerNode::getInputGeom(MDataBlock& data, unsigned 
     return inputHandle.outputValue().child(inputGeom).asMesh();
 }
 
-MStatus VectorDisplacementDeformerNode::getTextureData(MDataBlock& data, const MItGeometry& itGeometry, unsigned int geomIndex, MVectorArray& colorData, MDoubleArray& alphaData) const
-{
-    // Check plug
-
-    MStatus displacementMapPlugStatus;
-    MFnDependencyNode thisNode(thisMObject());
-    MPlug displacementMapPlug = thisNode.findPlug(DISPLACEMENT_MAP_ATTRIBUTE, true, &displacementMapPlugStatus);
-
-    if (displacementMapPlugStatus != MS::kSuccess)
-    {
-        return displacementMapPlugStatus; // Return same error that we got. In theory this should never be reached.
-    }
-
-    // Check if plug is connected to a source node
-
-    MPlugArray connections;
-    displacementMapPlug.connectedTo(connections, true, false);
-
-    if (connections.length() <= 0)
-    {
-        return MS::kInvalidParameter;
-    }
-
-    // Check if plugged in texture node is valid
-
-    MObject mapAttribute = thisNode.attribute(DISPLACEMENT_MAP_ATTRIBUTE);
-
-    bool isConnectedToValidNode = MDynamicsUtil::hasValidDynamics2dTexture(thisMObject(), mapAttribute);
-    if (!isConnectedToValidNode)
-    {
-        logError("Connected node is not a valid 2D texture node. Please connect a 2D texture node to the vector displacement map attribute.");
-        return MS::kInvalidParameter;
-    }
-
-    // Finally, get texture color and alpha data
-
-    MDoubleArray uCoords;
-    MDoubleArray vCoords;
-
-    VectorDisplacementUtilities::getMeshUvData(getInputGeom(data, geomIndex), uCoords, vCoords);
-
-    MStatus readTextureStatus = MDynamicsUtil::evalDynamics2dTexture(thisMObject(), mapAttribute, uCoords, vCoords, &colorData, &alphaData);
-
-    if (readTextureStatus == MS::kSuccess)
-    {
-        return MS::kSuccess;
-    }
-    else
-    {
-        logError("An error occurred when trying to read vector displacement map texture. Please verify that it is a valid texture");
-        return MS::kFailure;
-    }
-}
-
 void VectorDisplacementDeformerNode::logError(const MString& message) const
 {
     MString msg = name() + ": " + message;
@@ -211,9 +157,16 @@ MStatus initializePlugin(MObject obj)
 {
     MFnPlugin plugin(obj, "Jose Ivan Lopez Romo", "1.0", "Any");
 
-    MStatus status = plugin.registerNode("vectorDisplacement",
+    MString name(NODE_NAME);
+
+    MStatus status = plugin.registerNode(name,
         VectorDisplacementDeformerNode::Id, VectorDisplacementDeformerNode::creator,
         VectorDisplacementDeformerNode::initialize, MPxNode::kDeformerNode);
+
+    // Register GPU deformer override
+    MGPUDeformerRegistry::registerGPUDeformerCreator(name, name + "Override", VectorDisplacementGpuDeformerNode::getGPUDeformerInfo());
+    
+    VectorDisplacementGpuDeformerNode::kernelPath = plugin.loadPath(); 
 
     // Adding menus through C++ API to avoid having to include more complicated MEL/Python script setups for now
     MStringArray modelingMenuItem = plugin.addMenuItem("Vector Displacement", "mainDeformMenu", "deformer", "-type vectorDisplacement");
@@ -231,6 +184,9 @@ MStatus initializePlugin(MObject obj)
 MStatus uninitializePlugin(MObject obj)
 {
     MFnPlugin plugin(obj);
+
+    MString name(NODE_NAME);
+    MGPUDeformerRegistry::deregisterGPUDeformerCreator(name, name + "Override");
 
     MStatus status = plugin.deregisterNode(VectorDisplacementDeformerNode::Id);
 

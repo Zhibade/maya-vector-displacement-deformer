@@ -26,3 +26,16 @@ struct VertexData
     MVector tangent;
     MVector binormal;
 };
+
+struct GpuKernelData
+{
+    MAutoCLMem* inputPositions;
+    MAutoCLMem* outputPositions;
+    MAutoCLMem* textureData;
+    MAutoCLMem* paintWeightData;
+    MAutoCLMem* normalData;
+    MAutoCLMem* tangentData;
+    MAutoCLMem* binormalData;
+    unsigned int numOfElements = 0;
+    float strength = 1.f;
+};
