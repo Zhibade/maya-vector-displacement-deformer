@@ -29,11 +29,11 @@ public:
     * This is called every time the node will be evaluated when using GPU override.
     * This will fetch the data, send it to the GPU, run the GPU kernel and set the new vertex positions.
     *
-    * @param block - Data block for this node
-    * @param evaluationNode - Evaluation node that matches this deformer node
-    * @param outputPlug - Output plug for this node
-    * @param inputData - Input data for this deformer (vertex positions and geometry matrices)
-    * @param outputData - Output buffer where the output data will be written to
+    * @param[in] block - Data block for this node
+    * @param[in] evaluationNode - Evaluation node that matches this deformer node
+    * @param[in] outputPlug - Output plug for this node
+    * @param[in] inputData - Input data for this deformer (vertex positions and geometry matrices)
+    * @param[in,out] outputData - Output buffer where the output data will be written to
     *
     * @return Deform result status
     */

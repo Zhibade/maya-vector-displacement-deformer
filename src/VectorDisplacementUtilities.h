@@ -24,9 +24,9 @@ public:
     /**
     * Calculates the averaged and normalized tangent and binormals per vertex
     *
-    * @param meshItem - Mesh to get the vertex data from
-    * @param tangents - Reference to the array where tangets will be stored
-    * @param binormals - Reference to the array where binormals will be stored
+    * @param[in] meshItem - Mesh to get the vertex data from
+    * @param[out] tangents - Reference to the array where tangets will be stored
+    * @param[out] binormals - Reference to the array where binormals will be stored
     *
     * @return MStatus indicating wheter the operation was successful or not
     */
@@ -35,11 +35,11 @@ public:
     /**
     * Gets the final vertex position for the given vertex
     *
-    * @param vertexData - Current vertex data for the vertex that will be displaced
-    * @param mapRgbData - RGB data of the vector displacement map
-    * @param mapAlphaData - Alpha data of the vector displacement map
-    * @param strength - Displacement strength (1 = full vector displacement map effect, 0 = no effect)
-    * @param mapType - Vector displacement map type that corresponds to the texture data
+    * @param[in] vertexData - Current vertex data for the vertex that will be displaced
+    * @param[in] mapRgbData - RGB data of the vector displacement map
+    * @param[in] mapAlphaData - Alpha data of the vector displacement map
+    * @param[in] strength - Displacement strength (1 = full vector displacement map effect, 0 = no effect)
+    * @param[in] mapType - Vector displacement map type that corresponds to the texture data
     *
     * @return New vertex position as a point
     */
@@ -48,9 +48,9 @@ public:
     /**
     * Gets the given mesh UV data. Array indices correspond to the vertex index.
     *
-    * @param meshItem - Mesh to get the UV data from
-    * @param uCoords - Reference to the array where the U coords will be stored
-    * @param vCoords - Reference to the array where the V coords will be stored
+    * @param[in] meshItem - Mesh to get the UV data from
+    * @param[out] uCoords - Reference to the array where the U coords will be stored
+    * @param[out] vCoords - Reference to the array where the V coords will be stored
     *
     * @return MStatus indicating whether operation was successful or not
     */
@@ -59,10 +59,10 @@ public:
     /**
     * Gets the given mesh vertex data. Array indeces correspond to the vertex index.
     *
-    * @param meshItem - Mesh to get the vertex data from
-    * @param normals - Reference to the array where normals will be stored
-    * @param tangents - Reference to the array where tangets will be stored
-    * @param binormals - Reference to the array where binormals will be stored
+    * @param[in] meshItem - Mesh to get the vertex data from
+    * @param[out] normals - Reference to the array where normals will be stored
+    * @param[out] tangents - Reference to the array where tangets will be stored
+    * @param[out] binormals - Reference to the array where binormals will be stored
     *
     * @return MStatus indicating wheter the opration was successful or not
     */
@@ -85,9 +85,9 @@ private:
     /**
     * Applies the vector displacement map as an object space displacement
     *
-    * @param vertex - Original vertex position
-    * @param rgbData - RGB value that corresponds to this vertex
-    * @param strength - Displacement strength (1 = full vector displacement map effect, 0 = no effect)
+    * @param[in] vertex - Original vertex position
+    * @param[in] rgbData - RGB value that corresponds to this vertex
+    * @param[in] strength - Displacement strength (1 = full vector displacement map effect, 0 = no effect)
     *
     * @return Displaced vertex as an MPoint
     */
@@ -96,9 +96,9 @@ private:
     /**
     * Applies the vector displacement map as a tangent space displacement
     *
-    * @param vertexData - Vertex data to be used for the displacement
-    * @param rgbData - RGB value that corresponds to this vertex
-    * @param strength - Displacement strength (1 = full vector displacement map effect, 0 = no effect)
+    * @param[in] vertexData - Vertex data to be used for the displacement
+    * @param[in] rgbData - RGB value that corresponds to this vertex
+    * @param[in] strength - Displacement strength (1 = full vector displacement map effect, 0 = no effect)
     *
     * @return Displaced vertex as an MPoint
     */
@@ -107,7 +107,7 @@ private:
     /**
     * Logs an error using a predefined format using the given message
     *
-    * @param message - Error message to log
+    * @param[in] message - Error message to log
     */
     static void logError(const MString& message);
 };

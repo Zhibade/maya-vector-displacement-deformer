@@ -22,10 +22,10 @@ public:
     * Deform method implementation for this deformer.
     * Reads from a vector displacement map plugged in to this node to deform the vertices based on the texture data
     *
-    * @param data - Data block for this given node
-    * @param itGeometry - Geometry iterator for accessing mesh information
-    * @param localToWorldMatrix - Matrix for converting mesh data from local to world space
-    * @param mIndex - Corresponding shape index that is currently being deformed
+    * @param[in] data - Data block for this given node
+    * @param[in, out] itGeometry - Geometry iterator for accessing mesh information. Vertex position will be updated here.
+    * @param[in] localToWorldMatrix - Matrix for converting mesh data from local to world space
+    * @param[in] mIndex - Corresponding shape index that is currently being deformed
     *
     * @return MStatus indicating if operation was successful or not
     */
@@ -34,8 +34,8 @@ public:
     /**
     * Gets the input geometry object
     *
-    * @araom data - Data block for this given node
-    * @param geomIndex - Index of the geometry that should be fetched
+    * @param[in] data - Data block for this given node
+    * @param[in] geomIndex - Index of the geometry that should be fetched
     *
     * @return Input geometry as a MObject
     */
@@ -44,7 +44,7 @@ public:
     /**
     * Logs an error message using a predefined format (Node name + message)
     *
-    * @param message - Error message to log
+    * @param[in] message - Error message to log
     */
     virtual void logError(const MString& message) const;
 
